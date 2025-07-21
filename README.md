@@ -6,11 +6,11 @@ An AI-powered image captioning system that generates textual descriptions for im
 
 ##  Features
 
-- 📷 Image upload and caption generation using BLIP
-- 🎤 Converts captions to speech using Google Text-to-Speech (gTTS)
-- 🌐 Translates captions into 5 Indian languages
-- 🔊 Audio output available for download/playback
-- 📊 Evaluation with BLEU and CIDEr metrics
+-  Image upload and caption generation using BLIP
+-  Converts captions to speech using Google Text-to-Speech (gTTS)
+-  Translates captions into 5 Indian languages
+-  Audio output available for download/playback
+-  Evaluation with BLEU and CIDEr metrics
 
 ---
 
