@@ -1,10 +1,10 @@
-# 📸 PIC-2-SPEECH
+#  PIC-2-SPEECH
 
 An AI-powered image captioning system that generates textual descriptions for images using the BLIP (Bootstrapped Language-Image Pretraining) model and converts them into audio in five Indian languages (Kannada, Hindi, Marathi, Telugu, Tamil) using Google Text-to-Speech (gTTS).
 
 ---
 
-## 🌟 Features
+##  Features
 
 - 📷 Image upload and caption generation using BLIP
 - 🎤 Converts captions to speech using Google Text-to-Speech (gTTS)
@@ -14,7 +14,7 @@ An AI-powered image captioning system that generates textual descriptions for im
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 - **Frontend**: HTML, CSS, JavaScript
 - **Backend**: Python (Flask)
@@ -26,7 +26,7 @@ An AI-powered image captioning system that generates textual descriptions for im
 
 ---
 
-## 📁 Dataset
+##  Dataset
 
 We used the **Flickr8K** image-captioning dataset, which consists of 8,000 images each with 5 captions.  
 📎 Download Link: [Flickr8K Dataset](https://www.kaggle.com/datasets/adityajn105/flickr8k)
@@ -34,7 +34,7 @@ We used the **Flickr8K** image-captioning dataset, which consists of 8,000 image
 ---
 
 
-## 🚀 How to Run the Project
+##  How to Run the Project
 Clone the repository
 
 git clone https://github.com/monishanaik25/Pic-2-Speech.git
@@ -50,7 +50,7 @@ python app.py
 Access the app in your browser:
 
 http://localhost:5000
-📈 Evaluation
+ Evaluation
 The model is evaluated using:
 
 BLEU Score
@@ -58,14 +58,14 @@ Accuracy
 CIDEr Score
 (Mentioned in the project report or can be added later)
 
-🔮 Future Improvements
+ Future Improvements
 Add support for more languages
 
 Improve speech naturalness with advanced TTS models
 
 Add a mobile-friendly UI
 
-👩‍💻 Author
+ Author
 Monisha Naik
 📧 [GitHub](https://github.com/monishanaik25)
 
