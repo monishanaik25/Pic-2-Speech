@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pic-2-Speech Authentication</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e0eaff, #f8d7ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            animation: gradientShift 5s infinite alternate;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        .auth-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+            animation: slideIn 1.2s ease-in-out;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7b3ff6;
+            margin-bottom: 10px;
+            animation: bounce 1.5s infinite alternate;
+        }
+        .input-group {
+            margin: 15px 0;
+            display: flex;
+            justify-content: center;
+        }
+        input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s ease-in-out;
+            text-align: left;
+        }
+        input:focus {
+            border-color: #7b3ff6;
+            box-shadow: 0 0 8px rgba(123, 63, 246, 0.3);
+        }
+        .options {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .options label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+        .options a {
+            text-decoration: none;
+            color: #7b3ff6;
+        }
+        .btn {
+            background: linear-gradient(135deg, #7b3ff6, #c135ff);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+            animation: pulse 1.5s infinite alternate;
+            margin-top: 15px;
+        }
+        .btn:hover {
+            transform: scale(1.1);
+        }
+        .toggle {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .flash-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-5px); }
+        }
+        @keyframes pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+        @keyframes gradientShift {
+            from { background: linear-gradient(135deg, #e0eaff, #f8d7ff); }
+            to { background: linear-gradient(135deg, #d0f0ff, #fad0ff); }
+        }
+    </style>
+    <script>
+        function toggleForm() {
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-box">
+            <div class="logo">📷 <span>Pic-2-<strong>Speech</strong></span></div>
+            
+            {% if get_flashed_messages() %}
+            <div class="flash-message">
+                {% for message in get_flashed_messages() %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <div id="login-form">
+                <h2>Welcome back</h2>
+                <p>Please enter your details to sign in</p>
+                <form action="/login" method="post">
+                    <div class="input-group">
+                        <input type="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" name="password" placeholder="Password" required>
+                    </div>
+                    <div class="options">
+                        <label><input type="checkbox"> Remember me</label>
+                        <a href="#">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn">Sign in →</button>
+                </form>
+                <p class="toggle">Don't have an account? <a href="#" onclick="toggleForm()">Sign up for free</a></p>
+            </div>
+            
+            <div id="signup-form" style="display: none;">
+                <h2>Create Account</h2>
+                <p>Sign up to get started</p>
+                <form action="/signup" method="post">
+                    <div class="input-group">
+                        <input type="text" name="name" placeholder="Full Name" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" name="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" name="password" placeholder="Create Password" required>
+                    </div>
+                    <button type="submit" class="btn">Sign up →</button>
+                </form>
+                <p class="toggle">Already have an account? <a href="#" onclick="toggleForm()">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

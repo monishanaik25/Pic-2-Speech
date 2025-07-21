@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIC-2-SPEECH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                transform: translatey(0px);
+            }
+            50% {
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+                transform: translatey(-10px);
+            }
+            100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                transform: translatey(0px);
+            }
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 32px;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(to right, #ee7752, #e73c7e, #23a6d5);
+            animation: gradientBorder 5s ease infinite;
+            background-size: 200% 200%;
+        }
+        
+        @keyframes gradientBorder {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .upload-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 15px;
+        }
+        
+        .file-input {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .file-input input[type=file] {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .file-label {
+            display: inline-block;
+            background: linear-gradient(to right, #4e54c8, #8f94fb);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .file-label:hover {
+            background: linear-gradient(to right, #5e64d8, #9fa4fb);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #11998e, #38ef7d);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to right, #13a89c, #45f589);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .caption-area, .translate-area {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .caption-area:hover, .translate-area:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #444;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .result {
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+            background: linear-gradient(to right, #f6f9fc, #e9f1f7);
+            font-weight: 500;
+            color: #506677;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 0 0 0 rgba(142, 209, 252, 0.5);
+            }
+            70% {
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 0 10px 5px rgba(142, 209, 252, 0);
+            }
+            100% {
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 0 0 0 rgba(142, 209, 252, 0);
+            }
+        }
+        
+        select {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 2px solid #e1e1e1;
+            background: white;
+            font-size: 16px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            outline: none;
+        }
+        
+        select:focus {
+            border-color: #23a6d5;
+            box-shadow: 0 0 0 3px rgba(35, 166, 213, 0.2);
+        }
+        
+        .translate-btn {
+            background: linear-gradient(to right, #fc4a1a, #f7b733);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .translate-btn:hover {
+            background: linear-gradient(to right, #fd5a2a, #f8c743);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* For image preview */
+        .image-preview {
+            max-width: 100%;
+            margin: 20px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+            transition: all 0.3s ease;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* Particles animation */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles background -->
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <h1>PIC-2-SPEECH</h1>
+        
+        <div class="upload-area">
+            <div class="file-input">
+                <label for="fileInput" class="file-label">Choose File</label>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            <button class="btn" id="generateBtn">Generate Caption</button>
+        </div>
+        
+        <div class="image-preview" id="imagePreview">
+            <!-- Image will be displayed here -->
+        </div>
+        
+        <div class="caption-area">
+            <h2>Generated Caption</h2>
+            <div class="result" id="captionResult">Caption will appear here.</div>
+        </div>
+        
+        <div class="translate-area">
+            <h2>Translate Caption</h2>
+            <div class="translate-controls">
+                <select id="languageSelect">
+                    <option value="kn">Kannada</option>
+                    <option value="hi">Hindi</option>
+                    <option value="mr">Marathi</option>
+                    <option value="tl">Telugu</option>
+                    <option value="tm">Tamil</option>
+                </select>
+                <button class="translate-btn" id="translateBtn">Translate</button>
+            </div>
+            <div class="result" id="translationResult">Translation will appear here.</div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const colors = ['#ee7752', '#e73c7e', '#23a6d5', '#23d5ab'];
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random position
+                const posX = Math.random() * 100;
+                
+                // Random size
+                const size = Math.random() * 15 + 5;
+                
+                // Random color
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Random animation duration
+                const duration = Math.random() * 10 + 10;
+                
+                // Set styles
+                particle.style.left = `${posX}%`;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = color;
+                particle.style.boxShadow = `0 0 ${size}px ${color}`;
+                particle.style.animationName = 'float-up';
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // File input change handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgPreview = document.getElementById('imagePreview');
+                    imgPreview.style.display = 'block';
+                    imgPreview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Generate caption button
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) {
+                alert('Please select an image first.');
+                return;
+            }
+            
+            // Simulate API call with loading animation
+            const captionResult = document.getElementById('captionResult');
+            captionResult.textContent = 'Generating caption...';
+            captionResult.style.background = 'linear-gradient(to right, #f6f9fc, #e9f1f7)';
+            
+            // Simulate response (replace with actual API call)
+            setTimeout(() => {
+                captionResult.textContent = 'A beautiful landscape with mountains and a sunset.';
+                captionResult.style.background = 'linear-gradient(to right, #e7f0fd, #d6e4fc)';
+            }, 2000);
+        });
+        
+        // Translate button
+        document.getElementById('translateBtn').addEventListener('click', function() {
+            const captionResult = document.getElementById('captionResult');
+            const translationResult = document.getElementById('translationResult');
+            const language = document.getElementById('languageSelect').value;
+            
+            if (captionResult.textContent === 'Caption will appear here.' || 
+                captionResult.textContent === 'Generating caption...') {
+                alert('Please generate a caption first.');
+                return;
+            }
+            
+            // Simulate API call with loading animation
+            translationResult.textContent = 'Translating...';
+            translationResult.style.background = 'linear-gradient(to right, #f6f9fc, #e9f1f7)';
+            
+            // Simulate response (replace with actual API call)
+            setTimeout(() => {
+                const translations = {
+                    'kn': 'ಪರ್ವತಗಳು ಮತ್ತು ಸೂರ್ಯಾಸ್ತದೊಂದಿಗೆ ಸುಂದರವಾದ ಭೂದೃಶ್ಯ.',
+                    'hi': 'पहाड़ों और सूर्यास्त के साथ एक सुंदर परिदृश्य.',
+                    'mr': 'पर्वत आणि सूर्यास्तासह एक सुंदर भूदृश्य.',
+                    'tl': 'పర్వతాలు మరియు సూర్యాస్తమయంతో ఒక అందమైన దృశ్యం.',
+                    'tm': 'மலைகள் மற்றும் சூரிய அஸ்தமனத்துடன் ஒரு அழகான நிலப்பரப்பு.'
+                };
+                
+                translationResult.textContent = translations[language] || 'Translation not available';
+                translationResult.style.background = 'linear-gradient(to right, #fff7e6, #ffefc6)';
+            }, 1500);
+        });
+        
+        // Initialize particles on page load
+        window.addEventListener('load', createParticles);
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIC-2-SPEECH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Softer, lighter color gradient with sky blues, soft teals, and light yellows */
+            background: linear-gradient(-45deg, #a1d9ff, #c4f0ff, #e4f5ff, #f0f9ff);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                transform: translatey(0px);
+            }
+            50% {
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+                transform: translatey(-10px);
+            }
+            100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                transform: translatey(0px);
+            }
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 32px;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            bottom: 0;
+            left: 0;
+            /* Softer gradient for the underline */
+            background: linear-gradient(to right, #7fc9ff, #a1d9ff, #c4f0ff);
+            animation: gradientBorder 5s ease infinite;
+            background-size: 200% 200%;
+        }
+        
+        @keyframes gradientBorder {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .upload-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 15px;
+        }
+        
+        .file-input {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .file-input input[type=file] {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .file-label {
+            display: inline-block;
+            /* Softer blue gradient */
+            background: linear-gradient(to right, #7fc9ff, #a1d9ff);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .file-label:hover {
+            background: linear-gradient(to right, #a1d9ff, #c4f0ff);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn {
+            /* Soft teal gradient */
+            background: linear-gradient(to right, #80d9e6, #a5e1ea);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to right, #a5e1ea, #c4f0ff);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .caption-area, .translate-area {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .caption-area:hover, .translate-area:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #444;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .result {
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+            background: linear-gradient(to right, #f6f9fc, #e9f1f7);
+            font-weight: 500;
+            color: #506677;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 0 0 0 rgba(142, 209, 252, 0.5);
+            }
+            70% {
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 0 10px 5px rgba(142, 209, 252, 0);
+            }
+            100% {
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 0 0 0 rgba(142, 209, 252, 0);
+            }
+        }
+        
+        select {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 2px solid #e1e1e1;
+            background: white;
+            font-size: 16px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            outline: none;
+        }
+        
+        select:focus {
+            border-color: #7fc9ff;
+            box-shadow: 0 0 0 3px rgba(127, 201, 255, 0.2);
+        }
+        
+        .translate-btn {
+            /* Soft yellow-orange gradient */
+            background: linear-gradient(to right, #ffd78a, #ffecb5);
+            color: #996633;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .translate-btn:hover {
+            background: linear-gradient(to right, #ffecb5, #fff6dc);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* For image preview */
+        .image-preview {
+            max-width: 100%;
+            margin: 20px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+            transition: all 0.3s ease;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* Particles animation */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles background -->
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <h1>PIC-2-SPEECH</h1>
+        
+        <div class="upload-area">
+            <div class="file-input">
+                <label for="fileInput" class="file-label">Choose File</label>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            <button class="btn" id="generateBtn">Generate Caption</button>
+        </div>
+        
+        <div class="image-preview" id="imagePreview">
+            <!-- Image will be displayed here -->
+        </div>
+        
+        <div class="caption-area">
+            <h2>Generated Caption</h2>
+            <div class="result" id="captionResult">Caption will appear here.</div>
+        </div>
+        
+        <div class="translate-area">
+            <h2>Translate Caption</h2>
+            <div class="translate-controls">
+                <select id="languageSelect">
+                    <option value="kn">Kannada</option>
+                    <option value="hi">Hindi</option>
+                    <option value="mr">Marathi</option>
+                    <option value="tl">Telugu</option>
+                    <option value="tm">Tamil</option>
+                </select>
+                <button class="translate-btn" id="translateBtn">Translate</button>
+            </div>
+            <div class="result" id="translationResult">Translation will appear here.</div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            // Softer particle colors
+            const colors = ['#a1d9ff', '#c4f0ff', '#e4f5ff', '#f0f9ff', '#d6f0ff'];
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random position
+                const posX = Math.random() * 100;
+                
+                // Random size
+                const size = Math.random() * 15 + 5;
+                
+                // Random color
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Random animation duration
+                const duration = Math.random() * 10 + 10;
+                
+                // Set styles
+                particle.style.left = `${posX}%`;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = color;
+                particle.style.boxShadow = `0 0 ${size}px ${color}`;
+                particle.style.animationName = 'float-up';
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // File input change handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgPreview = document.getElementById('imagePreview');
+                    imgPreview.style.display = 'block';
+                    imgPreview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Generate caption button
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const fileInput = document.getElementById('fileInput');
+            if (!fileInput.files[0]) {
+                alert('Please select an image first.');
+                return;
+            }
+            
+            // Simulate API call with loading animation
+            const captionResult = document.getElementById('captionResult');
+            captionResult.textContent = 'Generating caption...';
+            captionResult.style.background = 'linear-gradient(to right, #f6f9fc, #e9f1f7)';
+            
+            // Simulate response (replace with actual API call)
+            setTimeout(() => {
+                captionResult.textContent = 'A beautiful landscape with mountains and a sunset.';
+                captionResult.style.background = 'linear-gradient(to right, #e7f0fd, #d6e4fc)';
+            }, 2000);
+        });
+        
+        // Translate button
+        document.getElementById('translateBtn').addEventListener('click', function() {
+            const captionResult = document.getElementById('captionResult');
+            const translationResult = document.getElementById('translationResult');
+            const language = document.getElementById('languageSelect').value;
+            
+            if (captionResult.textContent === 'Caption will appear here.' || 
+                captionResult.textContent === 'Generating caption...') {
+                alert('Please generate a caption first.');
+                return;
+            }
+            
+            // Simulate API call with loading animation
+            translationResult.textContent = 'Translating...';
+            translationResult.style.background = 'linear-gradient(to right, #f6f9fc, #e9f1f7)';
+            
+            // Simulate response (replace with actual API call)
+            setTimeout(() => {
+                const translations = {
+                    'kn': 'ಪರ್ವತಗಳು ಮತ್ತು ಸೂರ್ಯಾಸ್ತದೊಂದಿಗೆ ಸುಂದರವಾದ ಭೂದೃಶ್ಯ.',
+                    'hi': 'पहाड़ों और सूर्यास्त के साथ एक सुंदर परिदृश्य.',
+                    'mr': 'पर्वत आणि सूर्यास्तासह एक सुंदर भूदृश्य.',
+                    'tl': 'పర్వతాలు మరియు సూర్యాస్తమయంతో ఒక అందమైన దృశ్యం.',
+                    'tm': 'மலைகள் மற்றும் சூரிய அஸ்தமனத்துடன் ஒரு அழகான நிலப்பரப்பு.'
+                };
+                
+                translationResult.textContent = translations[language] || 'Translation not available';
+                translationResult.style.background = 'linear-gradient(to right, #fff7e6, #ffefc6)';
+            }, 1500);
+        });
+        
+        // Initialize particles on page load
+        window.addEventListener('load', createParticles);
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIC-2-SPEECH</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Softer, lighter color gradient with sky blues, soft teals, and light yellows */
+            background: linear-gradient(-45deg, #a1d9ff, #c4f0ff, #e4f5ff, #f0f9ff);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                transform: translatey(0px);
+            }
+            50% {
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+                transform: translatey(-10px);
+            }
+            100% {
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                transform: translatey(0px);
+            }
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 32px;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            bottom: 0;
+            left: 0;
+            /* Softer gradient for the underline */
+            background: linear-gradient(to right, #7fc9ff, #a1d9ff, #c4f0ff);
+            animation: gradientBorder 5s ease infinite;
+            background-size: 200% 200%;
+        }
+        
+        @keyframes gradientBorder {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .upload-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 15px;
+        }
+        
+        .file-input {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+        }
+        
+        .file-input input[type=file] {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .file-label {
+            display: inline-block;
+            /* Softer blue gradient */
+            background: linear-gradient(to right, #7fc9ff, #a1d9ff);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .file-label:hover {
+            background: linear-gradient(to right, #a1d9ff, #c4f0ff);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn {
+            /* Soft teal gradient */
+            background: linear-gradient(to right, #80d9e6, #a5e1ea);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .btn:hover {
+            background: linear-gradient(to right, #a5e1ea, #c4f0ff);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .caption-area, .translate-area {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .caption-area:hover, .translate-area:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #444;
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        .result {
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+            background: linear-gradient(to right, #f6f9fc, #e9f1f7);
+            font-weight: 500;
+            color: #506677;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 0 0 0 rgba(142, 209, 252, 0.5);
+            }
+            70% {
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 0 10px 5px rgba(142, 209, 252, 0);
+            }
+            100% {
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05), 0 0 0 0 rgba(142, 209, 252, 0);
+            }
+        }
+        
+        select {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 2px solid #e1e1e1;
+            background: white;
+            font-size: 16px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            outline: none;
+        }
+        
+        select:focus {
+            border-color: #7fc9ff;
+            box-shadow: 0 0 0 3px rgba(127, 201, 255, 0.2);
+        }
+        
+        .translate-btn, .audio-btn {
+            /* Soft yellow-orange gradient */
+            background: linear-gradient(to right, #ffd78a, #ffecb5);
+            color: #996633;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin: 0 5px;
+        }
+        
+        .translate-btn:hover, .audio-btn:hover {
+            background: linear-gradient(to right, #ffecb5, #fff6dc);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* For image preview */
+        .image-preview {
+            max-width: 100%;
+            margin: 20px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+            transition: all 0.3s ease;
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* Audio player styling */
+        .audio-player {
+            margin-top: 20px;
+            width: 100%;
+            display: none;
+        }
+        
+        .audio-player audio {
+            width: 100%;
+            border-radius: 30px;
+            outline: none;
+        }
+        
+        /* Loading animation */
+        .loading {
+            display: none;
+            margin: 10px auto;
+        }
+        
+        .loading:after {
+            content: " ";
+            display: block;
+            width: 30px;
+            height: 30px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 4px solid #007bff;
+            border-color: #007bff transparent #007bff transparent;
+            animation: loading 1.2s linear infinite;
+        }
+        
+        @keyframes loading {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Speech bubble for audio icon */
+        .audio-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(to right, #7fc9ff, #a1d9ff);
+            color: white;
+            margin-left: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .audio-icon:hover {
+            transform: scale(1.1);
+            background: linear-gradient(to right, #a1d9ff, #c4f0ff);
+        }
+        
+        /* Particles animation */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.5;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        
+        @keyframes float-up {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-100px) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles background -->
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <h1>PIC-2-SPEECH</h1>
+        
+        <div class="upload-area">
+            <div class="file-input">
+                <label for="fileInput" class="file-label">Choose File</label>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            <button class="btn" id="generateBtn">Generate Caption</button>
+        </div>
+        
+        <div class="image-preview" id="imagePreview">
+            <!-- Image will be displayed here -->
+        </div>
+        
+        <div class="caption-area">
+            <h2>Generated Caption</h2>
+            <div class="result" id="captionResult">Caption will appear here.</div>
+        </div>
+        
+        <div class="translate-area">
+            <h2>Translate Caption</h2>
+            <div class="translate-controls">
+                <select id="languageSelect">
+                    <option value="kn">Kannada</option>
+                    <option value="hi">Hindi</option>
+                    <option value="mr">Marathi</option>
+                    <option value="te">Telugu</option>
+                    <option value="ta">Tamil</option>
+                </select>
+                <button class="translate-btn" id="translateBtn">Translate</button>
+                <button class="audio-btn" id="audioBtn">
+                    <i class="audio-icon">🔊</i> Generate Audio
+                </button>
+            </div>
+            <div class="loading" id="loadingIndicator"></div>
+            <div class="result" id="translationResult">Translation will appear here.</div>
+            <div class="audio-player" id="audioPlayer">
+                <audio controls id="audioElement">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const colors = ['#a1d9ff', '#c4f0ff', '#e4f5ff', '#f0f9ff', '#d6f0ff'];
+            
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const posX = Math.random() * 100;
+                const size = Math.random() * 15 + 5;
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const duration = Math.random() * 10 + 10;
+                
+                particle.style.left = `${posX}%`;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = color;
+                particle.style.boxShadow = `0 0 ${size}px ${color}`;
+                particle.style.animationName = 'float-up';
+                particle.style.animationDuration = `${duration}s`;
+                particle.style.animationDelay = `${Math.random() * 5}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Variables to store caption and translation
+        let currentCaption = '';
+        let currentTranslation = '';
+        let currentLanguage = '';
+        
+        // File input change handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgPreview = document.getElementById('imagePreview');
+                    imgPreview.style.display = 'block';
+                    imgPreview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Generate caption button
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select an image first.');
+                return;
+            }
+            
+            const captionResult = document.getElementById('captionResult');
+            captionResult.textContent = 'Generating caption...';
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    currentCaption = data.caption;
+                    captionResult.textContent = data.caption;
+                    // Reset translation and audio when generating a new caption
+                    document.getElementById('translationResult').textContent = 'Translation will appear here.';
+                    document.getElementById('audioPlayer').style.display = 'none';
+                } else {
+                    captionResult.textContent = 'Error: ' + data.error;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                captionResult.textContent = 'Error generating caption. Please try again.';
+            });
+        });
+        
+        // Translate button
+        document.getElementById('translateBtn').addEventListener('click', function() {
+            const captionResult = document.getElementById('captionResult');
+            const translationResult = document.getElementById('translationResult');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            
+            if (captionResult.textContent === 'Caption will appear here.' || 
+                captionResult.textContent === 'Generating caption...' ||
+                captionResult.textContent.includes('Error')) {
+                alert('Please generate a valid caption first.');
+                return;
+            }
+            
+            // Get the text to translate
+            const textToTranslate = currentCaption || captionResult.textContent;
+            currentLanguage = document.getElementById('languageSelect').value;
+            
+            // Show loading indicator
+            loadingIndicator.style.display = 'block';
+            translationResult.textContent = 'Translating...';
+            
+            // Send translation request
+            fetch('/translate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: textToTranslate,
+                    language: currentLanguage
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingIndicator.style.display = 'none';
+                if (data.translated_text) {
+                    currentTranslation = data.translated_text;
+                    translationResult.textContent = data.translated_text;
+                } else if (data.error) {
+                    translationResult.textContent = 'Error: ' + data.error;
+                }
+                // Hide audio player when new translation is generated
+                document.getElementById('audioPlayer').style.display = 'none';
+            })
+            .catch(error => {
+                loadingIndicator.style.display = 'none';
+                console.error('Error:', error);
+                translationResult.textContent = 'Error translating. Please try again.';
+            });
+        });
+        
+        // Audio generation button
+        document.getElementById('audioBtn').addEventListener('click', function() {
+            const translationResult = document.getElementById('translationResult');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            
+            if (translationResult.textContent === 'Translation will appear here.' || 
+                translationResult.textContent.includes('Error') ||
+                translationResult.textContent === 'Translating...') {
+                alert('Please translate the caption first.');
+                return;
+            }
+            
+            // Get the text to convert to speech
+            const textToSpeak = currentTranslation || translationResult.textContent;
+            const language = currentLanguage || document.getElementById('languageSelect').value;
+            
+            // Show loading indicator
+            loadingIndicator.style.display = 'block';
+            
+            // Send text-to-speech request
+            fetch('/text-to-speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: textToSpeak,
+                    language: language
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingIndicator.style.display = 'none';
+                if (data.success && data.audio_url) {
+                    const audioElement = document.getElementById('audioElement');
+                    audioElement.src = data.audio_url;
+                    audioPlayer.style.display = 'block';
+                    audioElement.load();
+                    
+                    // Auto-play the audio
+                    audioElement.play().catch(e => {
+                        console.log('Auto-play prevented: ' + e);
+                    });
+                } else if (data.error) {
+                    alert('Error generating audio: ' + data.error);
+                }
+            })
+            .catch(error => {
+                loadingIndicator.style.display = 'none';
+                console.error('Error:', error);
+                alert('Error generating audio. Please try again.');
+            });
+        });
+        
+        // Initialize particles on page load
+        window.addEventListener('load', createParticles);
+    </script>
+</body>
+</html>

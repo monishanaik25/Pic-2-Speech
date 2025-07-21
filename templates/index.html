@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIC-2-SPEECH</title>
+     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(-45deg, #8b5dc6, #a07ad6, #c7b1e5, #e4dcf5);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #5e3a98;
+            margin-bottom: 30px;
+            font-size: 32px;
+            letter-spacing: 1px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        h1:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            bottom: 0;
+            left: 0;
+            background: linear-gradient(to right, #8b5dc6, #a07ad6, #c7b1e5);
+        }
+
+        .upload-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 15px;
+        }
+
+        .file-input {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .file-input input[type=file] {
+            position: absolute;
+            font-size: 100px;
+            right: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-label {
+            display: inline-block;
+            background: linear-gradient(to right, #8b5dc6, #a07ad6);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-label:hover {
+            background: linear-gradient(to right, #a07ad6, #c7b1e5);
+            transform: translateY(-3px);
+        }
+
+        .btn {
+            background: linear-gradient(to right, #7954b5, #9670cc);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(to right, #9670cc, #b28fe0);
+            transform: translateY(-3px);
+        }
+
+        .caption-area,
+        .translate-area {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        h2 {
+            color: #5e3a98;
+            margin-bottom: 15px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .result {
+            padding: 20px;
+            margin-top: 15px;
+            border-radius: 10px;
+            background: linear-gradient(to right, #f6f9fc, #e9f1f7);
+            font-weight: 500;
+            color: #5e3a98;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #captionResult {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 1.5;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            letter-spacing: 0.5px;
+            padding: 25px;
+            color: #3a2a6e;
+            border: 2px solid rgba(94, 58, 152, 0.2);
+            background: linear-gradient(to right, #f7f7ff, #eef5ff);
+        }
+
+        select {
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 2px solid #e1e1e1;
+            background: white;
+            font-size: 16px;
+            color: #555;
+            margin-right: 10px;
+        }
+
+        .translate-btn,
+        .audio-btn {
+            background: linear-gradient(to right, #8b5dc6, #a07ad6);
+            color: white;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 30px;
+            font-weight: 500;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .translate-btn:hover,
+        .audio-btn:hover {
+            background: linear-gradient(to right, #a07ad6, #c7b1e5);
+            transform: translateY(-3px);
+        }
+
+        .image-preview {
+            max-width: 500px;
+            /* Control the maximum width */
+            max-height: 500px;
+            /* Control the maximum height */
+            margin: 20px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* This ensures the image maintains its aspect ratio */
+            display: block;
+        }
+
+        .audio-player {
+            margin-top: 20px;
+            width: 100%;
+            display: none;
+        }
+
+        .audio-player audio {
+            width: 100%;
+            border-radius: 30px;
+            outline: none;
+        }
+
+        .loading {
+            display: none;
+            margin: 10px auto;
+            width: 40px;
+            height: 40px;
+        }
+
+        .loading:after {
+            content: " ";
+            display: block;
+            width: 30px;
+            height: 30px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 4px solid #8b5dc6;
+            border-color: #8b5dc6 transparent #8b5dc6 transparent;
+            animation: loading 1.2s linear infinite;
+        }
+
+        /* Caption loading spinner */
+        .caption-loading {
+            display: none;
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+        }
+
+        .caption-loading:after {
+            content: " ";
+            display: block;
+            width: 30px;
+            height: 30px;
+            margin: 0 auto;
+            border-radius: 50%;
+            border: 4px solid #8b5dc6;
+            border-color: #8b5dc6 transparent #8b5dc6 transparent;
+            animation: loading 1.2s linear infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .audio-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(to right, #8b5dc6, #a07ad6);
+            color: white;
+            margin-left: 10px;
+        }
+
+        /* Animation for caption appearance */
+        @keyframes captionAppear {
+            0% {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .caption-appear {
+            animation: captionAppear 0.5s ease forwards;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>PIC-2-SPEECH</h1>
+
+        <div class="upload-area">
+            <div class="file-input">
+                <label for="fileInput" class="file-label">Choose File</label>
+                <input type="file" id="fileInput" accept="image/*">
+            </div>
+            <button class="btn" id="generateBtn">Generate Caption</button>
+        </div>
+
+        <div class="image-preview" id="imagePreview"></div>
+
+        <div class="caption-area">
+            <h2>Generated Caption</h2>
+            <div class="caption-loading" id="captionLoading"></div>
+            <div class="result" id="captionResult">Caption will appear here.</div>
+        </div>
+
+        <div class="translate-area">
+            <h2>Translate Caption</h2>
+            <div class="translate-controls">
+                <select id="languageSelect">
+                    <option value="kn">Kannada</option>
+                    <option value="hi">Hindi</option>
+                    <option value="mr">Marathi</option>
+                    <option value="te">Telugu</option>
+                    <option value="ta">Tamil</option>
+                </select>
+                <button class="translate-btn" id="translateBtn">Translate</button>
+                <button class="audio-btn" id="audioBtn">
+                    <i class="audio-icon">🔊</i> Generate Audio
+                </button>
+            </div>
+            <div class="loading" id="loadingIndicator"></div>
+            <div class="result" id="translationResult">Translation will appear here.</div>
+            <div class="audio-player" id="audioPlayer">
+                <audio controls id="audioElement">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ SCRIPT WITH VALIDATION ADDED -->
+    <script>
+        let currentCaption = '';
+        let currentTranslation = '';
+        let currentLanguage = '';
+
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+
+            if (file && !allowedTypes.includes(file.type)) {
+                alert('Only image files are allowed (JPG, PNG).');
+                e.target.value = '';
+                document.getElementById('imagePreview').style.display = 'none';
+                return;
+            }
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const imgPreview = document.getElementById('imagePreview');
+                    imgPreview.style.display = 'block';
+                    imgPreview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('generateBtn').addEventListener('click', function () {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select an image first.');
+                return;
+            }
+
+            const captionResult = document.getElementById('captionResult');
+            const captionLoading = document.getElementById('captionLoading');
+
+            captionLoading.style.display = 'block';
+            captionResult.textContent = 'Generating caption...';
+            captionResult.classList.remove('caption-appear');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    captionLoading.style.display = 'none';
+
+                    if (data.success) {
+                        currentCaption = data.caption;
+                        captionResult.textContent = data.caption;
+                        captionResult.classList.add('caption-appear');
+                        document.getElementById('translationResult').textContent = 'Translation will appear here.';
+                        document.getElementById('audioPlayer').style.display = 'none';
+
+                        const imgPreview = document.getElementById('imagePreview');
+                        imgPreview.style.display = 'block';
+                        imgPreview.innerHTML = `<img src="${data.image_path}" alt="Cropped Preview">`;
+
+                    } else {
+                        captionResult.textContent = 'Error: ' + data.error;
+                    }
+                })
+                .catch(error => {
+                    captionLoading.style.display = 'none';
+                    console.error('Error:', error);
+                    captionResult.textContent = 'Error generating caption. Please try again.';
+                });
+        });
+
+        document.getElementById('translateBtn').addEventListener('click', function () {
+            const captionResult = document.getElementById('captionResult');
+            const translationResult = document.getElementById('translationResult');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+
+            if (captionResult.textContent === 'Caption will appear here.' ||
+                captionResult.textContent === 'Generating caption...' ||
+                captionResult.textContent.includes('Error')) {
+                alert('Please generate a valid caption first.');
+                return;
+            }
+
+            const textToTranslate = currentCaption || captionResult.textContent;
+            currentLanguage = document.getElementById('languageSelect').value;
+
+            loadingIndicator.style.display = 'block';
+            translationResult.textContent = 'Translating...';
+
+            fetch('/translate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: textToTranslate,
+                    language: currentLanguage
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    loadingIndicator.style.display = 'none';
+                    if (data.translated_text) {
+                        currentTranslation = data.translated_text;
+                        translationResult.textContent = data.translated_text;
+                    } else {
+                        translationResult.textContent = 'Error: ' + data.error;
+                    }
+                    document.getElementById('audioPlayer').style.display = 'none';
+                })
+                .catch(error => {
+                    loadingIndicator.style.display = 'none';
+                    console.error('Error:', error);
+                    translationResult.textContent = 'Error translating. Please try again.';
+                });
+        });
+
+        document.getElementById('audioBtn').addEventListener('click', function () {
+            const translationResult = document.getElementById('translationResult');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+
+            if (translationResult.textContent === 'Translation will appear here.' ||
+                translationResult.textContent.includes('Error') ||
+                translationResult.textContent === 'Translating...') {
+                alert('Please translate the caption first.');
+                return;
+            }
+
+            const textToSpeak = currentTranslation || translationResult.textContent;
+            const language = currentLanguage || document.getElementById('languageSelect').value;
+
+            loadingIndicator.style.display = 'block';
+
+            fetch('/text-to-speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: textToSpeak,
+                    language: language
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    loadingIndicator.style.display = 'none';
+                    if (data.success && data.audio_url) {
+                        const audioElement = document.getElementById('audioElement');
+                        audioElement.src = data.audio_url;
+                        audioPlayer.style.display = 'block';
+                        audioElement.load();
+                        audioElement.play().catch(e => {
+                            console.log('Auto-play prevented: ' + e);
+                        });
+                    } else {
+                        alert('Error generating audio: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    loadingIndicator.style.display = 'none';
+                    console.error('Error:', error);
+                    alert('Error generating audio. Please try again.');
+                });
+        });
+    </script>
+
+</body>
+
+</html>
